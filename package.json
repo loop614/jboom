@@ -1,0 +1,22 @@
+{
+  "name": "jboom",
+  "version": "1.0.0",
+  "description": "canvas fun and education",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/loop614/jboom.git"
+  },
+  "author": "loop614",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/loop614/jboom/issues"
+  },
+  "homepage": "https://github.com/loop614/jboom#readme",
+  "devDependencies": {
+    "typescript": "^5.2.2"
+  }
+}

@@ -1,6 +1,6 @@
-import { Game } from "./game.js"
+import { Game } from "./spaceship/game.js"
 
-(() => {
+((): void => {
     let canvas: HTMLCanvasElement = document.getElementById("canvas") as HTMLCanvasElement;
     let ctx: CanvasRenderingContext2D = canvas.getContext("2d") as CanvasRenderingContext2D;
     canvas.width = window.innerWidth;
@@ -8,7 +8,7 @@ import { Game } from "./game.js"
     let game: Game = new Game(canvas, ctx);
     let previousTimestamp: number | undefined = undefined;
 
-    function step(nowTimestamp: number) {
+    function step(nowTimestamp: number): void {
         if (previousTimestamp === undefined) {
             previousTimestamp = nowTimestamp;
         }

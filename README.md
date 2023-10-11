@@ -3,7 +3,6 @@
 
 ## Status
 - poc done 
-- next destroy targets
 
 ## Requirements
 - npm

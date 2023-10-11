@@ -91,7 +91,7 @@ export class Game {
     private createBullet() {
         let bullet: Bullet = new Bullet(0, 0);
         let bulletX: number = this.gun.pos.x + this.gun.width / 2 - bullet.width / 2;
-        let bulletY: number = this.gun.pos.y
+        let bulletY: number = this.gun.pos.y - bullet.height;
         bullet.setPosition(bulletX, bulletY);
         this.bullets.push(bullet);
     }

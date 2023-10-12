@@ -30,16 +30,16 @@ export class Game {
             return;
         }
         this.render(dt);
+        this.detectCollision();
+        if (this.targets.rects.length === 0) {
+            this.gameStopped = true;
+        }
     }
 
     private render(dt: number): void {
         this.gun.render(this.ctx, this.canvas.width, this.canvas.height);
         this.targets.render(this.ctx, this.canvas.width, this.canvas.height);
         this.bullets.render(this.ctx, this.canvas.width, this.canvas.height);
-        this.detectCollision();
-        if (this.targets.rects.length === 0) {
-            this.gameStopped = true;
-        }
     }
 
     private initEvents() {

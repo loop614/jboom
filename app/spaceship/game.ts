@@ -1,8 +1,6 @@
 import {Gun} from "./gun.js";
-import {TargetCollection} from "./targetCollection.js";
-import {BulletCollection} from "./bulletCollection.js";
-import {Bullet} from "./bullet.js";
-import {Target} from "./target.js";
+import {Target, TargetCollection} from "./target.js";
+import {Bullet, BulletCollection} from "./bullet.js";
 
 export class Game {
     canvas: HTMLCanvasElement;
@@ -10,6 +8,7 @@ export class Game {
     targets: TargetCollection;
     bullets: BulletCollection;
     gun: Gun;
+    dt: number;
     gameStopped: boolean;
 
     constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) {
@@ -20,29 +19,31 @@ export class Game {
         this.gun = new Gun(0, 0);
         this.gun.setPosition(canvas.width / 2 - this.gun.width / 2, canvas.height - this.gun.height - 50);
         this.gameStopped = false;
-        this.initEvents();
+        this.initKeydownEvents();
+        this.dt = 0;
         this.targets.initTargets(canvas.width);
     }
 
-    update(dt: number) {
+    public update(dt: number): void {
+        this.dt = dt;
         if (this.gameStopped) {
             this.stopGame();
             return;
         }
-        this.render(dt);
+        this.render();
         this.detectCollision();
         if (this.targets.rects.length === 0) {
             this.gameStopped = true;
         }
     }
 
-    private render(dt: number): void {
+    private render(): void {
         this.gun.render(this.ctx, this.canvas.width, this.canvas.height);
         this.targets.render(this.ctx, this.canvas.width, this.canvas.height);
-        this.bullets.render(this.ctx, this.canvas.width, this.canvas.height);
+        this.bullets.render(this.ctx, this.canvas.width, this.canvas.height, this.dt);
     }
 
-    private initEvents() {
+    private initKeydownEvents(): void {
         window.document.addEventListener('keydown', (event: KeyboardEvent): void => {
             switch (event.key) {
                 case ' ':
@@ -50,19 +51,19 @@ export class Game {
                     break;
                 case 'w':
                 case 'ArrowUp':
-                    this.gun.goUp();
+                    this.gun.goUp(this.dt);
                     break;
                 case 'a':
                 case 'ArrowLeft':
-                    this.gun.goLeft();
+                    this.gun.goLeft(this.dt);
                     break;
                 case 's':
                 case 'ArrowDown':
-                    this.gun.goDown();
+                    this.gun.goDown(this.dt);
                     break;
                 case 'd':
                 case 'ArrowRight':
-                    this.gun.goRight();
+                    this.gun.goRight(this.dt);
                     break;
                 case 'Escape':
                     this.gameStopped = true;
@@ -71,7 +72,7 @@ export class Game {
         }, false);
     }
 
-    private stopGame() {
+    private stopGame(): void {
         this.ctx.font = "34px serif";
         this.ctx.textAlign = "center";
         this.ctx.textBaseline = "middle";

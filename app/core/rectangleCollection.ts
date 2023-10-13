@@ -7,7 +7,7 @@ export class RectangleCollection {
         this.rects = [];
     }
 
-    public render(ctx: CanvasRenderingContext2D, canvasWidth: number, canvasHeight: number) {
+    public renderRects(ctx: CanvasRenderingContext2D, canvasWidth: number, canvasHeight: number): void {
         this.rects = this.rects.filter((_: Rectangle, i: number): boolean => {
             return this.rects[i].render(ctx, canvasWidth, canvasHeight);
         });

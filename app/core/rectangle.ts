@@ -16,7 +16,7 @@ export class Rectangle {
     }
 
     public render(ctx: CanvasRenderingContext2D, canvasWidth: number, canvasHeight: number): boolean {
-        if (this.isOutOfCanvas(canvasWidth, canvasHeight)) {
+        if (!this.isOver(new Rectangle(0, 0, canvasWidth, canvasHeight, ''))) {
             return false;
         }
 
@@ -36,21 +36,24 @@ export class Rectangle {
 
     }
 
-    public moveUp(up: number): void {
+    public goUp(up: number): void {
         this.setPosition(this.tl.x, this.tl.y - up);
     }
 
-    protected setPosition(x: number, y: number): void {
-        this.tl = new V2(x, y);
-        this.br = new V2(x + this.width, y + this.height);
+    public goLeft(left: number): void {
+        this.setPosition(this.tl.x - left, this.tl.y);
     }
 
-    private isOutOfCanvas(canvasWidth: number, canvasHeight: number): boolean {
-        let isLeftOf: boolean = this.tl.x + this.width < 0;
-        let isUpOf: boolean = this.tl.y + this.height < 0;
-        let isRightOf: boolean = this.tl.x - this.width > canvasWidth;
-        let isDownOf: boolean = this.tl.y - this.height > canvasHeight;
+    public goRight(right: number): void {
+        this.setPosition(this.tl.x + right, this.tl.y);
+    }
 
-        return isLeftOf || isRightOf || isUpOf || isDownOf;
+    public goDown(down: number): void {
+        this.setPosition(this.tl.x, this.tl.y + down);
+    }
+
+    public setPosition(x: number, y: number): void {
+        this.tl = new V2(x, y);
+        this.br = new V2(x + this.width, y + this.height);
     }
 }

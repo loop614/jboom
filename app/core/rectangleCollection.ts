@@ -1,19 +1,16 @@
-import {Rectangle} from "./rectangle.js"
+import {Rectangle, renderRectangle} from "./rectangle.js"
 
-export class RectangleCollection {
+export type RectangleCollection = {
     rects: Rectangle[]
+}
 
-    constructor() {
-        this.rects = [];
-    }
-
-    public renderRects(ctx: CanvasRenderingContext2D, canvasWidth: number, canvasHeight: number): void {
-        this.rects = this.rects.filter((_: Rectangle, i: number): boolean => {
-            return this.rects[i].render(ctx, canvasWidth, canvasHeight);
-        });
-    }
-
-    public addToCollection(newOne: Rectangle): void {
-        this.rects.push(newOne);
-    }
+export function renderRects(
+    rectangleCollection: RectangleCollection,
+    ctx: CanvasRenderingContext2D,
+    canvasWidth: number,
+    canvasHeight: number
+): void {
+    rectangleCollection.rects = rectangleCollection.rects.filter((_: Rectangle, i: number): boolean => {
+        return renderRectangle(rectangleCollection.rects[i], ctx, canvasWidth, canvasHeight)
+    });
 }

@@ -1,93 +1,97 @@
-import {Gun} from "./gun.js";
-import {Target, TargetCollection} from "./target.js";
-import {Bullet, BulletCollection} from "./bullet.js";
+import {GunCollection,renderGunCollection, createGunCollection, gunsGo} from "./gun.js";
+import {Target, TargetCollection, renderTargetCollection, createTargetCollection} from "./target.js";
+import {Bullet, BulletCollection, renderBulletCollection, createBulletCollection, addBullet} from "./bullet.js";
+import {isRectOver} from "../core/rectangle.js";
 
-export class Game {
+export type Game = {
     canvas: HTMLCanvasElement;
     ctx: CanvasRenderingContext2D;
-    targets: TargetCollection;
-    bullets: BulletCollection;
-    gun: Gun;
+    targetCollection: TargetCollection;
+    bulletCollection: BulletCollection;
+    gunCollection: GunCollection;
     dt: number;
     gameStopped: boolean;
+};
 
-    constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) {
-        this.canvas = canvas;
-        this.ctx = ctx;
-        this.targets = new TargetCollection();
-        this.bullets = new BulletCollection();
-        this.gun = new Gun(0, 0);
-        this.gun.setPosition(canvas.width / 2 - this.gun.width / 2, canvas.height - this.gun.height - 50);
-        this.gameStopped = false;
-        this.initKeydownEvents();
-        this.dt = 0;
-        this.targets.initTargets(canvas.width);
+export function createGame(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, dt: number): Game {
+    return {
+        canvas: canvas,
+        ctx: ctx,
+        targetCollection: createTargetCollection(canvas.width),
+        bulletCollection: createBulletCollection(),
+        gunCollection: createGunCollection(canvas.width, canvas.height),
+        gameStopped: false,
+        dt: dt,
+    };
+}
+
+
+export function updateGame(game: Game, dt: number, gameStopped: boolean): boolean {
+    game.dt = dt;
+    if (gameStopped) {
+        stopGame(game.ctx, game.canvas);
+        return true;
+    }
+    render(game);
+    if (game.bulletCollection.rects.length > 0) {
+        game = detectCollision(game);
+    }
+    if (game.targetCollection.rects.length === 0) {
+        gameStopped = true;
     }
 
-    public update(dt: number): void {
-        this.dt = dt;
-        if (this.gameStopped) {
-            this.stopGame();
-            return;
+    return gameStopped;
+}
+
+function render(game: Game): void {
+    renderGunCollection(game.gunCollection, game.ctx, game.canvas.width, game.canvas.height);
+    renderTargetCollection(game.targetCollection, game.ctx, game.canvas.width, game.canvas.height);
+    renderBulletCollection(game.bulletCollection, game.ctx, game.canvas.width, game.canvas.height, game.dt);
+}
+
+export function initKeydownEvents(game: Game): void {
+    window.document.addEventListener('keydown', (event: KeyboardEvent): void => {
+        switch (event.key) {
+            case ' ':
+                game.bulletCollection = addBullet(game.bulletCollection, game.gunCollection);
+                break;
+            case 'w':
+            case 'ArrowUp':
+                game.gunCollection = gunsGo(game.gunCollection, game.dt, "up");
+                break;
+            case 'a':
+            case 'ArrowLeft':
+                game.gunCollection = gunsGo(game.gunCollection, game.dt, "left");
+                break;
+            case 's':
+            case 'ArrowDown':
+                game.gunCollection = gunsGo(game.gunCollection, game.dt, "down");
+                break;
+            case 'd':
+            case 'ArrowRight':
+                game.gunCollection = gunsGo(game.gunCollection, game.dt, "right");
+                break;
         }
-        this.render();
-        this.detectCollision();
-        if (this.targets.rects.length === 0) {
-            this.gameStopped = true;
-        }
-    }
+    }, false);
+}
 
-    private render(): void {
-        this.gun.render(this.ctx, this.canvas.width, this.canvas.height);
-        this.targets.render(this.ctx, this.canvas.width, this.canvas.height);
-        this.bullets.render(this.ctx, this.canvas.width, this.canvas.height, this.dt);
-    }
+function stopGame(ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement): void {
+    ctx.font = "34px serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillStyle = "#E7E7E7";
+    ctx.fillText("Done", canvas.width / 2, canvas.height / 2);
+}
 
-    private initKeydownEvents(): void {
-        window.document.addEventListener('keydown', (event: KeyboardEvent): void => {
-            switch (event.key) {
-                case ' ':
-                    this.bullets.createBullet(this.gun);
-                    break;
-                case 'w':
-                case 'ArrowUp':
-                    this.gun.goUp(this.dt);
-                    break;
-                case 'a':
-                case 'ArrowLeft':
-                    this.gun.goLeft(this.dt);
-                    break;
-                case 's':
-                case 'ArrowDown':
-                    this.gun.goDown(this.dt);
-                    break;
-                case 'd':
-                case 'ArrowRight':
-                    this.gun.goRight(this.dt);
-                    break;
-                case 'Escape':
-                    this.gameStopped = true;
-                    break;
-            }
-        }, false);
-    }
-
-    private stopGame(): void {
-        this.ctx.font = "34px serif";
-        this.ctx.textAlign = "center";
-        this.ctx.textBaseline = "middle";
-        this.ctx.fillStyle = "#E7E7E7";
-        this.ctx.fillText("Done", this.canvas.width / 2, this.canvas.height / 2);
-    }
-
-    private detectCollision(): void {
-        this.bullets.rects = this.bullets.rects.filter((_: Bullet, i: number): boolean => {
-            let targetLen: number = this.targets.rects.length;
-            this.targets.rects = this.targets.rects.filter((_: Target, j: number): boolean => {
-                return !this.targets.rects[j].isOver(this.bullets.rects[i]);
-            });
-
-            return (targetLen - this.targets.rects.length) === 0;
+function detectCollision(game: Game): Game {
+    game.bulletCollection.rects = game.bulletCollection.rects.filter((_: Bullet, i: number): boolean => {
+        let targetLen: number = game.targetCollection.rects.length;
+        game.targetCollection.rects = game.targetCollection.rects.filter((_: Target, j: number): boolean => {
+            return !isRectOver(game.targetCollection.rects[j], game.bulletCollection.rects[i]);
         });
-    }
+
+        return (targetLen - game.targetCollection.rects.length) === 0;
+    });
+
+    return game;
 }

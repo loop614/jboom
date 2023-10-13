@@ -1,40 +1,88 @@
-import {Rectangle} from "../core/rectangle.js";
+import {Rectangle, TDirection, rectangleGo, setPosition, createRectangle} from "../core/rectangle.js";
+import {renderRects} from "../core/rectangleCollection.js";
 
-export class Gun extends Rectangle {
+export type Gun = {
     velocityHorizontal: number;
     velocityVertical: number;
+} & Rectangle;
 
-    constructor(
-        x: number,
-        y: number,
-        width: number = 200,
-        height: number = 20,
-        color: string = "green",
-        velocityHorizontal: number = 700,
-        velocityVertical: number = 500,
-    ) {
-        super(x, y, width, height, color);
-        this.velocityHorizontal = velocityHorizontal;
-        this.velocityVertical = velocityVertical;
-    }
+function createGun(
+    x: number,
+    y: number,
+    width: number = 200,
+    height: number = 20,
+    color: string = "green",
+    velocityHorizontal: number = 700,
+    velocityVertical: number = 500,
+): Gun {
+    let gun: Gun = createRectangle(x, y, width, height, color) as Gun;
+    gun.velocityHorizontal = velocityHorizontal;
+    gun.velocityVertical = velocityVertical;
 
-    public goUp(dt: number): void {
-        let up: number = this.velocityVertical * dt;
-        super.setPosition(this.tl.x, this.tl.y - up);
-    }
+    return gun;
+}
 
-    public goLeft(dt: number): void {
-        let left: number = this.velocityHorizontal * dt;
-        super.setPosition(this.tl.x - left, this.tl.y);
-    }
+export type GunCollection = {
+    rects: Gun[];
+};
 
-    public goRight(dt: number): void {
-        let right: number = this.velocityHorizontal * dt;
-        super.setPosition(this.tl.x + right, this.tl.y);
-    }
+export function createGunCollection(canvasWidth: number, canvasHeight: number): GunCollection {
+    let exampleGun: Gun = createGun(0, 0);
+    setPosition(exampleGun, canvasWidth / 2 - exampleGun.width / 2, canvasHeight - exampleGun.height - 50);
 
-    public goDown(dt: number): void {
-        let down: number = this.velocityVertical * dt;
-        super.setPosition(this.tl.x, this.tl.y + down);
+    return {rects: [exampleGun]};
+}
+
+export function renderGunCollection(
+    guns: GunCollection,
+    ctx: CanvasRenderingContext2D,
+    canvasWidth: number,
+    canvasHeight: number
+): void {
+    renderRects(guns, ctx, canvasWidth, canvasHeight);
+}
+
+export function gunsGo(guns: GunCollection, dt: number, direction: TDirection): GunCollection {
+    switch (direction) {
+        case "left":
+            return gunsGoLeft(guns, dt);
+        case "right":
+            return gunsGoRight(guns, dt);
+        case "up":
+            return gunsGoUp(guns, dt);
+        case "down":
+            return gunsGoDown(guns, dt);
     }
+}
+
+function gunsGoUp(guns: GunCollection, dt: number): GunCollection {
+    guns.rects.forEach((gun: Gun): void => {
+        rectangleGo(gun, gun.velocityVertical * dt, "up");
+    });
+
+    return guns;
+}
+
+function gunsGoLeft(guns: GunCollection, dt: number): GunCollection {
+    guns.rects.forEach((gun: Gun): void => {
+        rectangleGo(gun, gun.velocityHorizontal * dt, "left");
+    });
+
+    return guns;
+}
+
+function gunsGoRight(guns: GunCollection, dt: number): GunCollection {
+    guns.rects.forEach((gun: Gun): void => {
+        rectangleGo(gun, gun.velocityHorizontal * dt, "right");
+    });
+
+    return guns;
+}
+
+function gunsGoDown(guns: GunCollection, dt: number): GunCollection {
+    guns.rects.forEach((gun: Gun): void => {
+        rectangleGo(gun, gun.velocityVertical * dt, "down");
+    });
+
+    return guns;
 }

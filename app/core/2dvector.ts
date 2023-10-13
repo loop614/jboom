@@ -1,9 +1,4 @@
-export class V2 {
+export type V2 = {
     x: number;
     y: number;
-
-    constructor(x: number, y: number) {
-        this.x = x;
-        this.y = y;
-    }
 }

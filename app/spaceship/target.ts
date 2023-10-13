@@ -1,34 +1,39 @@
-import {RectangleCollection} from "../core/rectangleCollection.js";
+import {RectangleCollection, renderRects} from "../core/rectangleCollection.js";
 import {Bullet} from "./bullet.js";
-import {Rectangle} from "../core/rectangle.js";
+import {createRectangle, Rectangle} from "../core/rectangle.js";
+import {Gun} from "./gun";
 
-export class Target extends Rectangle {
-    constructor(
-        x: number,
-        y: number,
-        width: number = 20,
-        height: number = 20,
-        color: string = 'red'
-    ) {
-        super(x, y, width, height, color);
-    }
+export type Target = {
+} & Rectangle;
+
+function createTarget(
+    x: number,
+    y: number,
+    width: number = 20,
+    height: number = 20,
+    color: string = "red"
+): Target {
+    return createRectangle(x, y, width, height, color) as Target;
 }
 
-export class TargetCollection extends RectangleCollection {
+export type TargetCollection = {
     rects: Bullet[]
+} & RectangleCollection;
 
-    constructor() {
-        super();
-        this.rects = [];
+export function createTargetCollection(canvasWidth: number): TargetCollection {
+    let targets: TargetCollection = {rects: []};
+    for (let i: number = canvasWidth / 2 - 250; i < canvasWidth / 2 + 250; i = i + 30) {
+        targets.rects.push(createTarget(i, 5));
     }
 
-    public render(ctx: CanvasRenderingContext2D, canvasWidth: number, canvasHeight: number): void {
-        super.renderRects(ctx, canvasWidth, canvasHeight);
-    }
+    return targets;
+}
 
-    public initTargets(canvasWidth: number) {
-        for (let i: number = 10; i + 20 < canvasWidth; i = i + 30) {
-            this.addToCollection(new Target(i, 5));
-        }
-    }
+export function renderTargetCollection(
+    rects: TargetCollection,
+    ctx: CanvasRenderingContext2D,
+    canvasWidth: number,
+    canvasHeight: number
+): void {
+    renderRects(rects, ctx, canvasWidth, canvasHeight);
 }

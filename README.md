@@ -1,5 +1,9 @@
 ## Description
-- canvas fun
+- canvas starship game with targets, bullets, collision detection
+
+## TypeScript 
+- main branch holds the implementation with types. there is also a classes branch. Dist, the build folder is in the repo so the compiled js can be compared.
+
 
 ## Status
 - poc done

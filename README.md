@@ -2,7 +2,7 @@
 - canvas fun
 
 ## Status
-- poc done 
+- poc done
 
 ## Requirements
 - npm
@@ -15,3 +15,6 @@
 
 ## Development
 - ./node_modules/typescript/bin/tsc --watch
+
+## ScreenShot
+<p align="left"><img src="https://raw.githubusercontent.com/loop614/jboom/main/screenshot.png" alt="game screenshot" /></p>

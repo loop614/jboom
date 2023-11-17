@@ -1,6 +1,6 @@
 import { createRectangle, rectangleGo } from "../core/rectangle.js";
 import { renderRects } from "../core/rectangleCollection.js";
-export function createBullet(x, y, width = 20, height = 20, color = "blue", velocity = 40) {
+export function createBullet(x, y, width = 20, height = 20, color = "blue", velocity = 700) {
     let bullet = createRectangle(x, y, width, height, color);
     bullet.velocity = velocity;
     return bullet;

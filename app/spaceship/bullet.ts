@@ -13,7 +13,7 @@ export function createBullet(
     width: number = 20,
     height: number = 20,
     color: string = "blue",
-    velocity: number = 40,
+    velocity: number = 700,
 ): Bullet {
     let bullet: Bullet = createRectangle(x, y, width, height, color) as Bullet;
     bullet.velocity = velocity;
